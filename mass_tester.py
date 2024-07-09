@@ -4,7 +4,7 @@ import sys
 
 # Create or overwrite the results.csv file and write the header
 with open("results.csv", "w") as results_file:
-    results_file.write("name, test, error \n")
+    results_file.write("module, test, error \n")
 
 # Scan the current directory for Python files
 modules = []
@@ -56,6 +56,26 @@ def create_test_case(module_name, module_obj):
                 with open("results.csv", "a") as results_file:
                     results_file.write(f"{module_name}, missing func\n")
                 self.fail(f"No function with the name example_function in {module_name}")
+
+        def test_class_structure(self):
+            # Define the expected class names and their expected structure
+            expected_classes = {
+                'MyClass': ['method1', 'method2'],
+                'AnotherClass': ['attr1', 'attr2', 'method1']
+            }
+
+            for class_name, attributes in expected_classes.items():
+                # Check if the module has the expected class
+                if hasattr(module_obj, class_name):
+                    cls = getattr(module_obj, class_name)
+                    # Check for the expected attributes and methods
+                    for attr in attributes:
+                        self.assertTrue(hasattr(cls, attr), f"{class_name} is missing {attr}")
+                else:
+                    # If the class is missing, log it and fail the test
+                    with open("results.csv", "a") as results_file:
+                        results_file.write(f"{module_name}, missing class {class_name}\n")
+                    self.fail(f"No class with the name {class_name} in {module_name}")
 
     # Set the name of the test case class
     TestModule.__name__ = f"Test{module_name.capitalize()}"
